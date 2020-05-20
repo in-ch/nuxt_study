@@ -20,7 +20,7 @@ app.post("/user", async (req, res) => {
         nickname: req.body.nickname,
       },
     });
-    res.status(201).json(newUser); // 성공적으로 생성됨이라고 알려주는 건데, 사실 생략은 가능하다. 이런 것을 HTTP STATUS CODE 라고 한다.
+    res.status(201).json(newUser); // 성공적으로 생성됨이라고 알려주는 건데, 사실 생략은 가능하다. 이런 것을 HTTP STATUS CODE 라고 한다. -> 검색하면 알게 됨, 200은 성공이고 201은 성공적으로 생성했다 라는 뜻.
   } catch (err) {
     console.log(err);
     next(err);

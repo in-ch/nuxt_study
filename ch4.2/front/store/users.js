@@ -69,7 +69,9 @@ export const actions = {
   ) {
     //commit은 mutations을 실행시키는 거, displatch는 actions를 실행시키는 거,
     commit("setMe", payload); // 유저의 상태를 바꾸기 위해 사용
-    this.$axios.post("/user", {
+
+    this.$axios.post("http://localhost:3085/user", {
+      // 다른 서버이기 때문에 이렇게 해줘야됨, 하지만 그냥 저장된 되는 것은 아니고, 백엔드 쪽에서 허락을 해줘야함
       // 이런 것을 REST API라고 한다.
       email: payload.email,
       nickname: payload.nickname,
