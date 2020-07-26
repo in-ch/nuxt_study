@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       email: {
         type: DataTypes.STRING(40), // 문자열이고 30자 이내여야 한다.
         allowNull: false,
+        unique: true, // 중복 금지
       },
       nickname: {
         type: DataTypes.STRING(20),
