@@ -12,8 +12,8 @@ import { createStore } from './store.js'
 
 /* Plugins */
 
-import nuxt_plugin_plugin_85e95116 from 'nuxt_plugin_plugin_85e95116' // Source: ./vuetify/plugin.js (mode: 'all')
-import nuxt_plugin_axios_7b6898a2 from 'nuxt_plugin_axios_7b6898a2' // Source: ./axios.js (mode: 'all')
+import nuxt_plugin_plugin_2c6ddffa from 'nuxt_plugin_plugin_2c6ddffa' // Source: ./vuetify/plugin.js (mode: 'all')
+import nuxt_plugin_axios_1910f93e from 'nuxt_plugin_axios_1910f93e' // Source: ./axios.js (mode: 'all')
 
 // Component: <ClientOnly>
 Vue.component(ClientOnly.name, ClientOnly)
@@ -44,7 +44,7 @@ Vue.use(Meta, {"keyName":"head","attribute":"data-n-head","ssrAttribute":"data-n
 
 const defaultTransition = {"name":"page","mode":"out-in","appear":false,"appearClass":"appear","appearActiveClass":"appear-active","appearToClass":"appear-to"}
 
-async function createApp (ssrContext) {
+async function createApp(ssrContext, config = {}) {
   const router = await createRouter(ssrContext)
 
   const store = createStore(ssrContext)
@@ -133,7 +133,7 @@ async function createApp (ssrContext) {
     ssrContext
   })
 
-  const inject = function (key, value) {
+  function inject(key, value) {
     if (!key) {
       throw new Error('inject(key, value) has no key provided')
     }
@@ -144,6 +144,10 @@ async function createApp (ssrContext) {
     key = '$' + key
     // Add into app
     app[key] = value
+    // Add into context
+    if (!app.context[key]) {
+      app.context[key] = value
+    }
 
     // Add into store
     store[key] = app[key]
@@ -156,7 +160,7 @@ async function createApp (ssrContext) {
     Vue[installKey] = true
     // Call Vue.use() to install the plugin into vm
     Vue.use(() => {
-      if (!Object.prototype.hasOwnProperty.call(Vue, key)) {
+      if (!Object.prototype.hasOwnProperty.call(Vue.prototype, key)) {
         Object.defineProperty(Vue.prototype, key, {
           get () {
             return this.$root.$options[key]
@@ -166,6 +170,9 @@ async function createApp (ssrContext) {
     })
   }
 
+  // Inject runtime config as $config
+  inject('config', config)
+
   if (process.client) {
     // Replace store state before plugins execution
     if (window.__NUXT__ && window.__NUXT__.state) {
@@ -173,14 +180,28 @@ async function createApp (ssrContext) {
     }
   }
 
+  // Add enablePreview(previewData = {}) in context for plugins
+  if (process.static && process.client) {
+    app.context.enablePreview = function (previewData = {}) {
+      app.previewData = Object.assign({}, previewData)
+      inject('preview', previewData)
+    }
+  }
   // Plugin execution
 
-  if (typeof nuxt_plugin_plugin_85e95116 === 'function') {
-    await nuxt_plugin_plugin_85e95116(app.context, inject)
+  if (typeof nuxt_plugin_plugin_2c6ddffa === 'function') {
+    await nuxt_plugin_plugin_2c6ddffa(app.context, inject)
   }
 
-  if (typeof nuxt_plugin_axios_7b6898a2 === 'function') {
-    await nuxt_plugin_axios_7b6898a2(app.context, inject)
+  if (typeof nuxt_plugin_axios_1910f93e === 'function') {
+    await nuxt_plugin_axios_1910f93e(app.context, inject)
+  }
+
+  // Lock enablePreview in context
+  if (process.static && process.client) {
+    app.context.enablePreview = function () {
+      console.warn('You cannot call enablePreview() outside a plugin.')
+    }
   }
 
   // If server-side, wait for async component to be resolved first

@@ -1,8 +1,6 @@
 import Axios from 'axios'
 import defu from 'defu'
 
-const $nuxt = typeof window !== 'undefined' && window['$nuxt']
-
 // Axios.prototype cannot be modified
 const axiosExtra = {
   setBaseURL (baseURL) {
@@ -82,7 +80,10 @@ const setupProgress = (axios) => {
     set: () => { }
   }
 
-  const $loading = () => ($nuxt && $nuxt.$loading && $nuxt.$loading.set) ? $nuxt.$loading : noopLoading
+  const $loading = () => {
+    const $nuxt = typeof window !== 'undefined' && window['$nuxt']
+    return ($nuxt && $nuxt.$loading && $nuxt.$loading.set) ? $nuxt.$loading : noopLoading
+  }
 
   let currentRequests = 0
 
