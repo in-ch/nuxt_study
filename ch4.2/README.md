@@ -57,3 +57,4 @@ Response는 응답의 body임...
 만약 설치를 했는데도 [ Unhandled rejection SequelizeConnectionError: Unknown database 'ollious' ] 라는 메시지를 내놓고 막힌다면
 
 일단 [ npm install -g sequelize-cli ] 해주고 [ sequelize db:create ] 해주면 해결된다.
+
