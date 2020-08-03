@@ -1,18 +1,37 @@
 const express = require("express");
 const cors = require('cors');   // 허용해 주기 위해.. 요청을 .. 
 const bcrypt = require('bcrypt');
-
 const db = require("./models"); // index.js의 db 변수 불러온 것이다.
+const passport = require('passport');
+const session = require('express-session');
+const cookie = require('cookie-parser');
+const morgan = require('morgan');  // 요청이 왔을 때 콘솔에다가 기록을 해줌 
+
+
+const passportConfig = require('./passport');
 const app = express();
 
 
-db.sequelize.sync(); // 서버가 실행되는 것이다.
+db.sequelize.sync({ force: false }); // 서버가 실행되는 것이다.
+                                     // force : true가 된다면 기존 테이블 다 지우고 새로 생성하게 된다 => 기존 데이터 다 삭제.... 
+                                     // 삭제되기 싫다면, migration이라는 것을 새로 익혀야 한다. 
+passportConfig();
 
-
-
+app.use(morgan('dev'));
 app.use(cors('http://localhost:3000'));
 app.use(express.json()); // 기본적으로 app.js는 json형식의 데이터를 받지 못하므로 이렇게 선언해야 json형식의 데이터를 받을 수 있다.
 app.use(express.urlencoded({ extended: false })); // app.js에 전송되는 데이터가 form 형식을 경우 app.js에서 받을 수 있는 데이터로 바꿔줌.
+app.use(cookie());
+app.use(session({
+  resave: false,
+  saveuninitialized: false,
+  secret: 'cookiesecret',
+}));
+app.use(passport.initialize());  // 요청에 보통 로그인과 로그아웃 기능을 만들어줌..  
+app.use(passport.session());     // 세션을 만들어 주는데 세션을 할려면 express session을 추가적으로 설치해야함
+
+// 밑에 get() 들은 다 라우터 들임..
+// get이 가져오다. post가 생성하다 . put이 전체 수정. fetch가 부분 수정, delete가 삭제...   애매할 때는 보통 post쓴다. 
 
 app.get("/", (req, res) => {
   res.send("안녕 시퀄라이즈");
@@ -45,6 +64,15 @@ app.post("/user", async (req, res, next) => {
   }
 });
 
+app.post('/user/login',(res, req) => {   // 로그인 라우터
+  req.body.email;
+  req.body.password;
+  // 이메일이랑 패스워드 검사 
+
+});
+
+
 app.listen(3085, () => {
   console.log(`백엔드 ${3085}번 포트에서 작동 중.`);
 });
+
