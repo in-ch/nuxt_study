@@ -42,7 +42,9 @@ app.post("/user", async (req, res, next) => {
     const hash = await bcrypt.hash(req.body.password, 12); //bcrypt를 통해서 암호화 
     
     const exUser = await db.User.findOne({    // 이미 회원가입되어 있는 이메일을 찾기 위한 코드 
-      email: req.body.email,
+      where: {
+        email: req.body.email,
+      },
     });
 
     if(exUser) {  // 이미 회원가입되어있다면
@@ -64,11 +66,39 @@ app.post("/user", async (req, res, next) => {
   }
 });
 
-app.post('/user/login',(res, req) => {   // 로그인 라우터
-  req.body.email;
-  req.body.password;
-  // 이메일이랑 패스워드 검사 
+const user = {
 
+};
+
+app.post('/user/login',(res, req) => {   // 로그인 라우터
+  //req.body.email;
+  //req.body.password;
+  // 이메일이랑 패스워드 검사 
+  // await db.User.findeOne();
+  //
+  // user[cookie] = 유저정보;   // 쿠키를 통해 user 정보 저장
+  // 프론트에 쿠기 내려보내기 
+
+  // 로그인 세션 처리를 위한 npm i passport passport-local 설치 
+
+  passport.authenticate('local', (err, user, info) => { // 로그인... !! , local.js에 데이터를 보냄
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+
+    if (info) {
+      return res.status(401).send(info.reason);
+    }
+
+    return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
+        if(err) {
+          console.error(err);
+          return next(err);
+        }
+        return res.json(user); // 프론트로 정보 넘겨주기 . body에 보내는 것임 
+    })   // 위에 passport.initialize 기능임
+  })(res, req, next);
 });
 
 
