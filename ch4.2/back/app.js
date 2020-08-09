@@ -16,14 +16,21 @@ db.sequelize.sync({ force: false }); // 서버가 실행되는 것이다.
 passportConfig();
 
 app.use(morgan('dev'));
-app.use(cors('http://localhost:3000'));
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(express.json()); // 기본적으로 app.js는 json형식의 데이터를 받지 못하므로 이렇게 선언해야 json형식의 데이터를 받을 수 있다.
 app.use(express.urlencoded({ extended: false })); // app.js에 전송되는 데이터가 form 형식을 경우 app.js에서 받을 수 있는 데이터로 바꿔줌.
-app.use(cookie());
+app.use(cookie('cookiesecret'));
 app.use(session({
   resave: false,
-  saveuninitialized: false,
+  saveUninitialized: false,
   secret: 'cookiesecret',
+  cookie: {
+    httpOnly: true,
+    secure: false,
+  },
 }));
 app.use(passport.initialize());  // 요청에 보통 로그인과 로그아웃 기능을 만들어줌..  
 app.use(passport.session());     // 세션을 만들어 주는데 세션을 할려면 express session을 추가적으로 설치해야함
@@ -69,7 +76,7 @@ app.post("/user", async (req, res, next) => {
       }
   
       return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 ... 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
-                                               //                                       ㄴ passport > index.js에 있음
+          console.log(err);                    //                                       ㄴ passport > index.js에 있음
           if(err) {
             console.error(err);
             return next(err);
@@ -85,20 +92,14 @@ app.post("/user", async (req, res, next) => {
 });
 
 const user = {
-
+  'asdfasdfasdf' : 1,
+  'asdxcv' : 2,
+  'zxcvzxcv' : 3,
 };
 
 app.post('/user/login',(res, req, next) => {   // 로그인 라우터
-  //req.body.email;
-  //req.body.password;
-  // 이메일이랑 패스워드 검사 
-  // await db.User.findeOne();
-  //
-  // user[cookie] = 유저정보;   // 쿠키를 통해 user 정보 저장
-  // 프론트에 쿠기 내려보내기 
 
   // 로그인 세션 처리를 위한 npm i passport passport-local 설치 
-
   passport.authenticate('local', (err, user, info) => { // 로그인... !! , local.js에 데이터를 보냄, 여기도 전달하는 인수가 3개
     if (err) {
       console.error(err);
@@ -110,7 +111,7 @@ app.post('/user/login',(res, req, next) => {   // 로그인 라우터
     }
 
     return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 ... 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
-                                             //                                       ㄴ passport > index.js에 있음
+        console.log(err);                    //                                       ㄴ passport > index.js에 있음
         if(err) {
           console.error(err);
           return next(err);
@@ -120,7 +121,6 @@ app.post('/user/login',(res, req, next) => {   // 로그인 라우터
     })   // 위에 passport.initialize 기능임
   })(res, req, next);
 });
-
 
 app.listen(3085, () => {
   console.log(`백엔드 ${3085}번 포트에서 작동 중.`);

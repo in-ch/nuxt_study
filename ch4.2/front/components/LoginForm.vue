@@ -54,7 +54,7 @@ export default {
         this.$store
           .dispatch("users/login", {
             email: this.email,
-            nickname: "지은갓갓갓"
+            password: this.password,
           })
           .then(() => {
             this.$router.push({

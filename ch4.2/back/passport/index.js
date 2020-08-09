@@ -8,5 +8,5 @@ module.exports = () => {
   });
   passport.deserializeUser(async (id, done) => {
   });
-  local();
+  local;
 };
