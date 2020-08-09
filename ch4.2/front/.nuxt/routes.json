@@ -3,19 +3,22 @@
     "name": "profile",
     "path": "/profile",
     "component": "/home/in_ch/dashboard/nuxt_study/ch4.2/front/pages/profile.vue",
-    "chunkName": "pages/profile"
+    "chunkName": "pages/profile",
+    "_name": "_6713d534"
   },
   {
     "name": "signup",
     "path": "/signup",
     "component": "/home/in_ch/dashboard/nuxt_study/ch4.2/front/pages/signup.vue",
-    "chunkName": "pages/signup"
+    "chunkName": "pages/signup",
+    "_name": "_16037046"
   },
   {
     "name": "hashtag-id",
     "path": "/hashtag/:id?",
     "component": "/home/in_ch/dashboard/nuxt_study/ch4.2/front/pages/hashtag/_id/index.vue",
-    "chunkName": "pages/hashtag/_id/index"
+    "chunkName": "pages/hashtag/_id/index",
+    "_name": "_11afc505"
   },
   {
     "path": "/post/:id?",
@@ -26,20 +29,24 @@
         "name": "post-id",
         "path": "",
         "component": "/home/in_ch/dashboard/nuxt_study/ch4.2/front/pages/post/_id/index.vue",
-        "chunkName": "pages/post/_id/index"
+        "chunkName": "pages/post/_id/index",
+        "_name": "_e3501f5a"
       }
-    ]
+    ],
+    "_name": "_7a9305d0"
   },
   {
     "name": "user-id",
     "path": "/user/:id?",
     "component": "/home/in_ch/dashboard/nuxt_study/ch4.2/front/pages/user/_id/index.vue",
-    "chunkName": "pages/user/_id/index"
+    "chunkName": "pages/user/_id/index",
+    "_name": "_c3b04784"
   },
   {
     "name": "index",
     "path": "/",
     "component": "/home/in_ch/dashboard/nuxt_study/ch4.2/front/pages/index.vue",
-    "chunkName": "pages/index"
+    "chunkName": "pages/index",
+    "_name": "_7597789d"
   }
 ]

@@ -6,8 +6,6 @@ const passport = require('passport');
 const session = require('express-session');
 const cookie = require('cookie-parser');
 const morgan = require('morgan');  // 요청이 왔을 때 콘솔에다가 기록을 해줌 
-
-
 const passportConfig = require('./passport');
 const app = express();
 
@@ -54,12 +52,32 @@ app.post("/user", async (req, res, next) => {
       })   //403 은 금지의 의미이다.  그리고 응답 보낼 때는 무조건 return 써주자.. 응답 두 번 보내면 안되고 오류 난다. 
     }
 
-    const newUser = await db.User.create({
+    await db.User.create({
         email: req.body.email,
         password: hash,
         nickname: req.body.nickname,
     });
-    res.status(201).json(newUser); // 성공적으로 생성됨이라고 알려주는 건데, 사실 생략은 가능하다. 이런 것을 HTTP STATUS CODE 라고 한다. -> 검색하면 알게 됨, 200은 성공이고 201은 성공적으로 생성했다 라는 뜻.
+
+    passport.authenticate('local', (err, user, info) => { // 로그인... !! , local.js에 데이터를 보냄, 여기도 전달하는 인수가 3개
+      if (err) {
+        console.error(err);
+        return next(err);
+      }
+  
+      if (info) {
+        return res.status(401).send(info.reason);
+      }
+  
+      return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 ... 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
+                                               //                                       ㄴ passport > index.js에 있음
+          if(err) {
+            console.error(err);
+            return next(err);
+          }
+  
+          return res.json(user); // 프론트로 정보 넘겨주기 . body에 보내는 것임 
+      })   // 위에 passport.initialize 기능임
+    })(res, req, next);
   } catch (err) {
     console.log(err);
     return next(err);
@@ -70,7 +88,7 @@ const user = {
 
 };
 
-app.post('/user/login',(res, req) => {   // 로그인 라우터
+app.post('/user/login',(res, req, next) => {   // 로그인 라우터
   //req.body.email;
   //req.body.password;
   // 이메일이랑 패스워드 검사 
@@ -81,7 +99,7 @@ app.post('/user/login',(res, req) => {   // 로그인 라우터
 
   // 로그인 세션 처리를 위한 npm i passport passport-local 설치 
 
-  passport.authenticate('local', (err, user, info) => { // 로그인... !! , local.js에 데이터를 보냄
+  passport.authenticate('local', (err, user, info) => { // 로그인... !! , local.js에 데이터를 보냄, 여기도 전달하는 인수가 3개
     if (err) {
       console.error(err);
       return next(err);
@@ -91,11 +109,13 @@ app.post('/user/login',(res, req) => {   // 로그인 라우터
       return res.status(401).send(info.reason);
     }
 
-    return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
+    return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 ... 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
+                                             //                                       ㄴ passport > index.js에 있음
         if(err) {
           console.error(err);
           return next(err);
         }
+
         return res.json(user); // 프론트로 정보 넘겨주기 . body에 보내는 것임 
     })   // 위에 passport.initialize 기능임
   })(res, req, next);

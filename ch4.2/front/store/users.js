@@ -64,22 +64,30 @@ export const mutations = {
 export const actions = {
   // 비동기적인, 서버통신 등의 복잡한 작업이 들어 간다.
   signUp(
-    { commit, dispatch, state, rootState, getters, rootGetters },
-    payload
-  ) {
-    //commit은 mutations을 실행시키는 거, displatch는 actions를 실행시키는 거,
-    commit("setMe", payload); // 유저의 상태를 바꾸기 위해 사용
-
+    { commit, dispatch, state, rootState, getters, rootGetters }, payload) {
+      //commit은 mutations을 실행시키는 거, displatch는 actions를 실행시키는 거,
     this.$axios.post("http://localhost:3085/user", {
       // 다른 서버이기 때문에 이렇게 해줘야됨, 하지만 그냥 저장된 되는 것은 아니고, 백엔드 쪽에서 허락을 해줘야함
       // 이런 것을 REST API라고 한다.
       email: payload.email,
       nickname: payload.nickname,
       password: payload.password,
+    }).then((data) => {
+      commit('setMe', payload);
+      console.log(data);
+    }).catch((err) => {
+      console.log(err);
     });
   },
-  login({ commit, dispatch, state, rootState, getters, rootGetters }, payload) {
-    commit("setMe", payload);
+  login({ commit }, payload) {
+    this.$axios.post('http://localhost:3085/user/login', {
+      email: payload.email,
+      password: payload.password,
+    }).then((data) => {
+      commit('setMe', payload);
+    }).catch((err) => {
+      console.error(err);
+    });
   },
   logOut(
     { commit, dispatch, state, rootState, getters, rootGetters },
