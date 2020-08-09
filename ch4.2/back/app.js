@@ -22,10 +22,10 @@ app.use(cors({
 }));
 app.use(express.json()); // 기본적으로 app.js는 json형식의 데이터를 받지 못하므로 이렇게 선언해야 json형식의 데이터를 받을 수 있다.
 app.use(express.urlencoded({ extended: false })); // app.js에 전송되는 데이터가 form 형식을 경우 app.js에서 받을 수 있는 데이터로 바꿔줌.
-app.use(cookie('cookiesecret'));
+app.use(cookie());
 app.use(session({
   resave: false,
-  saveUninitialized: false,
+  saveuninitialized: false,
   secret: 'cookiesecret',
   cookie: {
     httpOnly: true,
@@ -98,28 +98,32 @@ const user = {
 };
 
 app.post('/user/login',(res, req, next) => {   // 로그인 라우터
+  //req.body.email;
+  //req.body.password;
+  // 이메일이랑 패스워드 검사 
+  // await db.User.findeOne();
+  //
+  // user[cookie] = 유저정보;   // 쿠키를 통해 user 정보 저장
+  // 프론트에 쿠기 내려보내기 
 
   // 로그인 세션 처리를 위한 npm i passport passport-local 설치 
-  passport.authenticate('local', (err, user, info) => { // 로그인... !! , local.js에 데이터를 보냄, 여기도 전달하는 인수가 3개
+
+  passport.authenticate('local', (err, user, info) => {
     if (err) {
       console.error(err);
       return next(err);
     }
-
     if (info) {
       return res.status(401).send(info.reason);
     }
-
-    return req.login(user, async (err) => {  // 세션에다 사용자 정보 저장 ... 어떻게..? serializeUser로 하지 -> 세션에다가 사용자 정보 저장하고, 프론트에 쿠키 내려다 준다. 
-        console.log(err);                    //                                       ㄴ passport > index.js에 있음
-        if(err) {
-          console.error(err);
-          return next(err);
-        }
-
-        return res.json(user); // 프론트로 정보 넘겨주기 . body에 보내는 것임 
-    })   // 위에 passport.initialize 기능임
-  })(res, req, next);
+    return req.login(user, async (err) => { // 세션에다 사용자 정보 저장 (어떻게? serializeUser)
+      if (err) {
+        console.error(err);
+        return next(err);
+      }
+      return res.json(user);
+    });
+  })(req, res, next);
 });
 
 app.listen(3085, () => {

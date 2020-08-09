@@ -83,6 +83,7 @@ export const actions = {
     this.$axios.post('http://localhost:3085/user/login', {
       email: payload.email,
       password: payload.password,
+    }, {withCredentials: true,
     }).then((data) => {
       commit('setMe', payload);
     }).catch((err) => {
